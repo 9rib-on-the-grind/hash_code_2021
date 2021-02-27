@@ -3,8 +3,8 @@
 
 ## Team 🅰️🅱️🅾️🅱️🅰️ takes 1188 place
 
-* @electropavuk
-* @AlexPagarsky
+* [electropavuk](https://github.com/electropavuk)
+* [AlexPagarsky](https://github.com/AlexPagarsky)
 
 
 
