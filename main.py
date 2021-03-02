@@ -1,6 +1,6 @@
+import enum
 from pprint import pprint
 from collections import defaultdict
-import enum
 
 
 class Solver:
@@ -17,7 +17,6 @@ class Solver:
         self.set_mean_route_lengths()
         self.set_nodes()
         self.set_schedule()
-
 
     def set_route_length(self):
         for car in self.cars:
@@ -42,9 +41,11 @@ class Solver:
     def set_schedule(self):
         for idx, node in enumerate(self.nodes):
             node = sorted(filter(lambda x: x.route_count, node), key=self.sort_by_mean)
+
             if node:
                 min_count = min(node, key=lambda x: x.route_count).route_count
                 mean = sum(street.route_count for street in node) // len(node)
+
                 for sidx, street in enumerate(node):
                     if street.route_count:
                         duration = max(1, street.route_count // (3 * min_count))
@@ -53,23 +54,25 @@ class Solver:
     def sort_by_mean(self, street):
         return street.mean_route_length
 
-
     def output_res(self, filename):
         nodes_count = len(self.schedule) - self.schedule.count([])
+
         with open(filename, 'w') as f:
             f.write(str(nodes_count) + '\n')
+            
             for idx, node in enumerate(self.schedule):
+
                 if node:
                     f.write(str(idx) + '\n')
+                    
                     street_count = len(node)
                     f.write(str(street_count) + '\n')
+
                     for street in node:
                         f.write(f'{street[0]} {street[1]}\n')
 
 
-
 class Car:
-    # car is street_count, street_names
     def __init__(self, idx, p: int, *streets: [str]):
         self.idx = idx
         self.p = int(p)
@@ -89,22 +92,14 @@ class Car:
         return self.idx == other.idx
 
 
-
 class Street:
-    # street is begin, end, name, length
-
     def __init__(self, b: int, e: int, name: str, l: int):
         self.begin = int(b)
         self.end = int(e)
         self.length = int(l)
         self.name = name
-
         self.mean_route_length = 0
         self.route_count = 0
-
-
-
-
 
 
 def read_data(filename: str):
@@ -121,9 +116,6 @@ def read_data(filename: str):
             cars[i] = Car(i, *f.readline().split())
 
         return D, I, S, V, F, streets, cars
-
-
-
 
 
 if __name__ == '__main__':
