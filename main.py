@@ -1,14 +1,7 @@
-import enum
-from pprint import pprint
-from collections import defaultdict
-
-
 class Solver:
-    def __init__(self, streets, cars, D, F, I):
+    def __init__(self, streets, cars, I):
         self.streets = {street.name: street for street in streets}
         self.cars = set(cars)
-        self.duration = D
-        self.score = F
         self.nodes = [[] for i in range(I)]
         self.schedule = [[] for i in range(I)]
 
@@ -41,12 +34,10 @@ class Solver:
     def set_schedule(self):
         for idx, node in enumerate(self.nodes):
             node = sorted(filter(lambda x: x.route_count, node), key=self.sort_by_mean)
-
             if node:
                 min_count = min(node, key=lambda x: x.route_count).route_count
                 mean = sum(street.route_count for street in node) // len(node)
-
-                for sidx, street in enumerate(node):
+                for street in node:
                     if street.route_count:
                         duration = max(1, street.route_count // (3 * min_count))
                         self.schedule[idx].append([street.name, duration])
@@ -56,18 +47,13 @@ class Solver:
 
     def output_res(self, filename):
         nodes_count = len(self.schedule) - self.schedule.count([])
-
         with open(filename, 'w') as f:
             f.write(str(nodes_count) + '\n')
-            
             for idx, node in enumerate(self.schedule):
-
                 if node:
                     f.write(str(idx) + '\n')
-                    
                     street_count = len(node)
                     f.write(str(street_count) + '\n')
-
                     for street in node:
                         f.write(f'{street[0]} {street[1]}\n')
 
@@ -78,18 +64,6 @@ class Car:
         self.p = int(p)
         self.streets = streets
         self.route_length = None
-
-    def __str__(self):
-        return 'streets :' + str(self.streets)
-
-    def __repr__(self):
-        return str(self.streets)
-
-    def __hash__(self):
-        return self.idx
-
-    def __eq__(self, other):
-        return self.idx == other.idx
 
 
 class Street:
@@ -102,29 +76,24 @@ class Street:
         self.route_count = 0
 
 
+
 def read_data(filename: str):
     with open(filename) as f:
         D, I, S, V, F = [int(x) for x in f.readline().strip().split()]
-
         streets = [None] * S
         for i in range(S):
             streets[i] = Street(*f.readline().split())
-
-
         cars = [None] * V
         for i in range(V):
             cars[i] = Car(i, *f.readline().split())
-
-        return D, I, S, V, F, streets, cars
+    return D, I, S, V, F, streets, cars
 
 
 if __name__ == '__main__':
     ext = '.txt'
-    names =['a', 'b', 'c', 'd', 'e', 'f']
-
-    for file in names:
+    filenames = list('abcdef')
+    for file in filenames:
         D, I, S, V, F, streets, cars = read_data('in/' + file + ext)
-
-        s = Solver(streets, cars, D, F, I)
+        s = Solver(streets, cars, I)
         s.solve()
         s.output_res('out/out_' + file + ext)
